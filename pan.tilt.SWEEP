@@ -1,0 +1,39 @@
+#include <Servo.h>
+#define top A0
+#define bot A5
+
+Servo lidarServoTop;
+Servo lidarServoBot;
+
+int positionTop = 80;    
+int positionBot = 0; 
+
+void setup() {
+  Serial.begin(9600);
+  lidarServoTop.attach(top);
+  lidarServoBot.attach(bot);
+}
+
+void loop() {
+  for (positionTop = 80; positionTop <= 180; positionTop += 5) {
+    lidarServoTop.write(positionTop);
+    Serial.print(positionTop);
+    Serial.print("Lidar Moving Backwards");
+    Serial.println();
+    delay(100);                       
+  }
+  for (positionBot = 0; positionBot <= 180; positionBot += 10){
+    lidarServoBot.write(positionBot);
+    Serial.print(positionBot);
+    Serial.print("Lidar Bottom Forward");
+    Serial.println();
+    delay(300);
+  }
+   for (positionTop = 180; positionTop >= 80; positionTop -= 5) {
+    lidarServoTop.write(positionTop);
+    Serial.print(positionTop);
+    Serial.print("Lidar Moving Forward");
+    Serial.println();
+    delay(100);
+  }
+}
