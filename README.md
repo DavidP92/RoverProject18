@@ -1,4 +1,4 @@
-# RoverProject18
-Team Members: David Paez, Ty Rider, Crystal Talbert, Brandy Cortez
+# RoverProject19
+Team Members: David Paez, Ty Riding, Crystal M
 
 import -m
