@@ -1,0 +1,207 @@
+//Libraries Imported Necessary to Run Equipment
+#include <Servo.h>    
+#include <Wire.h>
+#include <LIDARLite.h>
+#include <LiquidCrystal.h>
+
+#define tServo A0
+#define bServo A2   
+
+//Variables of Servo, Slave ID#
+#define SLAVEID1 0x1
+#define SLAVEID2 0x2
+
+//Pan-Tilt Variables
+Servo topServo;
+Servo botServo;
+LIDARLite Laser;
+
+//Lidar Variables 
+int posTT = 80;   //Top Servo Position
+int posB = 0;     //Bottom Servo Position
+int posBB = 180;  //Bottom Floor Sweep End Position
+int posBL = 0;    //Bottom Left Stop Position
+int posBM = 95;   //Bottom Midpoint Stop Position
+int posTM = 80;   //Top Midpoint Stop Position
+
+int scan = 15;   //Number of Laser Scans
+
+char inByte;     //Variable for Receiving Command
+
+const int rs = 12, en = 11, p1 = 5, p2 = 4, p3 = 3, p4 = 2;
+LiquidCrystal lcd(rs, en, p1, p2, p3, p4);
+
+unsigned long timer_1;  // Timer -> Screen
+unsigned long timer_2;  // Timer -> Laser measurment
+unsigned long timer_3;
+unsigned long timer_4;
+
+uint8_t delay_1 = 15; // Screeen delay
+uint8_t delay_2 = 3; // Laser measurement
+
+const uint8_t buffersize = 50;       // Size of the buffer for the laser
+uint8_t _buffer[buffersize];  // Data structure to store data for averaging.
+uint8_t pos = 0;              // Location in the buffer where the laser data will be stored
+uint8_t avgdist = 0;          // Averaged distance
+
+void setup() {
+//  Serial.begin(9600);     //Serial Monitoring For Servo Troubleshooting
+  Serial.begin(115200);   //Serial Monitoring For Lidar Troubleshooting
+  mainSetup();
+  delay(1000);
+  timer_1 = millis();
+  timer_2 = timer_1;
+  timer_3 = timer_2;
+  timer_4 = timer_3;
+}
+
+void loop() {
+  unsigned long now = millis();
+  if (now - timer_1 > delay_1) {
+    writescreen((String)avgdist);
+    printdata();
+    timer_1 = now;
+  }
+  
+  if (now - timer_2 > delay_2) {
+    laserRead();
+    timer_2 = now;
+  }
+}
+
+///Function of Setup 
+void mainSetup() {
+  writescreen("Starting Setup");
+  
+  topServo.attach(tServo);
+  delay(10);
+  botServo.attach(bServo);
+  delay(10);
+  Laser.begin(0, true);
+  delay(10);
+  Wire.begin();
+ /* Parameters
+    ----------------------------------------------------------------------------
+    configuration:  Default 0.
+      0: Default mode, balanced performance.
+      1: Short range, high speed. Uses 0x1d maximum acquisition count.
+      2: Default range, higher speed short range. Turns on quick termination
+          detection for faster measurements at short range (with decreased
+          accuracy)
+      3: Maximum range. Uses 0xff maximum acquisition count.
+      4: High sensitivity detection. Overrides default valid measurement detection
+          algorithm, and uses a threshold value for high sensitivity and noise.
+      5: Low sensitivity detection. Overrides default valid measurement detection
+          algorithm, and uses a threshold value for low sensitivity and noise.
+    lidarliteAddress: Default 0x62. Fill in new address here if changed. See
+      operating manual for instructions.
+  */
+  Laser.configure(0);
+  delay(100);
+  Serial.println("Setup Complete");
+  writescreen("Setup Completed");
+}
+
+void sendCommand(const int slaveid, const int dir){
+  Wire.beginTransmission(slaveid); // transmit to device #8
+  Wire.write(dir);              // sends one byte
+  Wire.endTransmission(); 
+}
+
+void recCommand(int bytes){
+  inByte = Wire.read();
+}
+
+void laserRead(){
+    _buffer[pos++] = Laser.distance();
+    if (pos > buffersize)
+      pos = 0;
+}
+
+void writescreen(String data) {
+  lcd.clear(); 
+  lcd.begin(16,2);
+  lcd.print(data);
+}
+
+void printdata() {
+  String b = "Data:\t";
+  float dataout = 0;
+  for (int i = 0; i < buffersize; i++)
+    dataout += _buffer[i];
+  dataout /= buffersize;
+  Serial.println((uint8_t)dataout);
+  avgdist = dataout;
+}
+
+void motorpos(uint8_t x, uint8_t y, uint8_t z) {
+  
+}
+
+//void sweep(int timer, int posTT, int scan) {
+//  for (posTT; posTT <= 180; posTT += 5) {
+////    Serial.print("(1)The position of Top is : ");
+////    Serial.print(posTT);
+////    Serial.print("  Movement Function: ");
+//    Serial.println("Sweep Function");
+//    laserRead(timer,scan);
+//    topServo.write(posTT);
+//    delay(timer);
+//  }
+//}
+//
+//void floorSweep(int timer, int posB, int scan) {
+//  for (posB; posB <= 185; posB += 5) {
+////    Serial.print("(3)The position of Top is : ");
+////    Serial.print(posB);
+////    Serial.print("  Movement Function: ");
+//    Serial.println("Floor Sweep Function");
+//    laserRead(timer,scan);
+//    botServo.write(posB);
+//    delay(timer);
+//  }
+//}
+//
+//void midStop(int timer, int posBM, int scan) {
+////  Serial.print("(5)The position of Top is : ");
+////  Serial.print(posBM);
+////  Serial.print("  Movement Function: ");
+//  Serial.println("Mid-Stop Function.!");
+//  laserRead(timer,scan);
+//  botServo.write(posBM);
+//  topServo.write(posTM);
+//  delay(timer);
+//}
+//
+//void botleftStop(int posBL, int timer, int scan){
+////  Serial.print("(6)The position of Top is : ");
+////  Serial.print(posBL);
+////  Serial.print("  Movement Function: ");
+//  Serial.println("Bottom Left Stop");
+//  laserRead(timer,scan);
+//  botServo.write(posBL);
+//  delay(timer);
+//}
+/*
+void backfloorSweep(int timer, int posBB, int scan) {
+  for (posBB; posBB <= 180; posBB -= 5) {
+    botServo.write(posBB);
+    Serial.print("(4)The position of Top is : ");
+    Serial.print(posBB);
+    Serial.print("  Movement Function: ");
+    Serial.println("Backward Top Function");
+    delay(timer);
+  }
+}
+
+void backSweep(int timer, int posTTB, int scan) {
+  for (posTB; posTB >= 180; posTB -= 5) {
+    topServo.write(posTB);
+    Serial.print("(2)The position of Top is : ");
+    Serial.print(posTB);
+    Serial.print("  Movement Function: ");
+    Serial.println("Bottom Backward Function");
+    delay(timer);
+  }
+}
+*/
