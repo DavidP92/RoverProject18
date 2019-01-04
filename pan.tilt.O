@@ -134,74 +134,44 @@ void printdata() {
   avgdist = dataout;
 }
 
-void motorpos(uint8_t x, uint8_t y, uint8_t z) {
-  
-}
-
-//void sweep(int timer, int posTT, int scan) {
-//  for (posTT; posTT <= 180; posTT += 5) {
-////    Serial.print("(1)The position of Top is : ");
-////    Serial.print(posTT);
-////    Serial.print("  Movement Function: ");
-//    Serial.println("Sweep Function");
-//    laserRead(timer,scan);
-//    topServo.write(posTT);
-//    delay(timer);
-//  }
-//}
-//
-//void floorSweep(int timer, int posB, int scan) {
-//  for (posB; posB <= 185; posB += 5) {
-////    Serial.print("(3)The position of Top is : ");
-////    Serial.print(posB);
-////    Serial.print("  Movement Function: ");
-//    Serial.println("Floor Sweep Function");
-//    laserRead(timer,scan);
-//    botServo.write(posB);
-//    delay(timer);
-//  }
-//}
-//
-//void midStop(int timer, int posBM, int scan) {
-////  Serial.print("(5)The position of Top is : ");
-////  Serial.print(posBM);
-////  Serial.print("  Movement Function: ");
-//  Serial.println("Mid-Stop Function.!");
-//  laserRead(timer,scan);
-//  botServo.write(posBM);
-//  topServo.write(posTM);
-//  delay(timer);
-//}
-//
-//void botleftStop(int posBL, int timer, int scan){
-////  Serial.print("(6)The position of Top is : ");
-////  Serial.print(posBL);
-////  Serial.print("  Movement Function: ");
-//  Serial.println("Bottom Left Stop");
-//  laserRead(timer,scan);
-//  botServo.write(posBL);
-//  delay(timer);
-//}
-/*
-void backfloorSweep(int timer, int posBB, int scan) {
-  for (posBB; posBB <= 180; posBB -= 5) {
-    botServo.write(posBB);
-    Serial.print("(4)The position of Top is : ");
-    Serial.print(posBB);
-    Serial.print("  Movement Function: ");
-    Serial.println("Backward Top Function");
+void verticalSweep(int timer, int posTT) {
+  for (posTT; posTT <= 180; posTT += 5) {
+   Serial.print("(1)The position of Top is : ");
+   Serial.print(posTT);
+   Serial.print("  Movement Function: ");    
+   Serial.println("Sweep Function");
+   topServo.write(posTT);
     delay(timer);
   }
 }
 
-void backSweep(int timer, int posTTB, int scan) {
-  for (posTB; posTB >= 180; posTB -= 5) {
-    topServo.write(posTB);
-    Serial.print("(2)The position of Top is : ");
-    Serial.print(posTB);
+void horizontalSweep(int timer, int posB) {
+  for (posB; posB <= 185; posB += 5) {
+    Serial.print("(3)The position of Top is : ");
+    Serial.print(posB);
     Serial.print("  Movement Function: ");
-    Serial.println("Bottom Backward Function");
+    Serial.println("Floor Sweep Function");
+    botServo.write(posB);
     delay(timer);
   }
 }
-*/
+
+void midStop(int timer, int posBM) {
+  Serial.print("(5)The position of Top is : ");
+  Serial.print(posBM);
+  Serial.print("  Movement Function: ");
+  Serial.println("Mid-Stop Function.!");
+  botServo.write(posBM);
+  topServo.write(posTM);
+  delay(timer);
+  }
+
+void botleftStop(int posBL, int timer){
+  Serial.print("(6)The position of Top is : ");
+  Serial.print(posBL);
+  Serial.print("  Movement Function: ");
+  Serial.println("Bottom Left Stop");
+  botServo.write(posBL);
+  delay(timer);
+}
+
