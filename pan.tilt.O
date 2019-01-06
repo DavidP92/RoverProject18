@@ -5,7 +5,7 @@
 #include <LiquidCrystal.h>
 #include <XBee.h>
 #include <SoftwareSerial.h>
-
+#include <math.h>
 
 //Software Serial Pinout
 #define samples 110
@@ -46,12 +46,8 @@ Servo botServo;
 LIDARLite Laser;
 
 //Lidar Variables 
-int posTT = 80;   //Top Servo Position
-int posB = 0;     //Bottom Servo Position
-int posBB = 180;  //Bottom Floor Sweep End Position
-int posBL = 0;    //Bottom Left Stop Position
-int posBM = 95;   //Bottom Midpoint Stop Position
-int posTM = 80;   //Top Midpoint Stop Position
+const int posX = 0;
+const int posY = 0;
 
 int scan = 15;   //Number of Laser Scans
 
@@ -129,8 +125,7 @@ void mainSetup() {
   delay(100);
   //XBee Setup
   Serial.begin(57600); 
-  Serial1.begin(57600);
-  xbee.setSerial(Serial1);
+  xbee.setSerial(outputSerial);
   outputSerial.begin(57600);
 
   //Initialize i2c communications
@@ -240,43 +235,39 @@ void i2cPrint()
   Wire.write(currHeadingI2c, 2);
   // as expected by master
 }
-void verticalSweep(int timer, int posTT) {
-  for (posTT; posTT <= 180; posTT += 5) {
+void verticalSweep(int posY, int steps) {
+  for (posY; posY <= 180; posY += steps) {
    Serial.print("(1)The position of Top is : ");
-   Serial.print(posTT);
+   Serial.print(posY);
    Serial.print("  Movement Function: ");    
    Serial.println("Sweep Function");
-   topServo.write(posTT);
-    delay(timer);
+   topServo.write(posY);
   }
 }
 
-void horizontalSweep(int timer, int posB) {
-  for (posB; posB <= 185; posB += 5) {
+void horizontalSweep(int posX, int steps) {
+  for (posX; posX <= 185; posX += steps) {
     Serial.print("(3)The position of Top is : ");
-    Serial.print(posB);
+    Serial.print(posX);
     Serial.print("  Movement Function: ");
     Serial.println("Floor Sweep Function");
-    botServo.write(posB);
-    delay(timer);
+    botServo.write(posX);
   }
 }
 
-void midStop(int timer, int posBM) {
+void midStop(int posX, int posY, int steps) {
   Serial.print("(5)The position of Top is : ");
-  Serial.print(posBM);
+  Serial.print(posY);
   Serial.print("  Movement Function: ");
   Serial.println("Mid-Stop Function.!");
-  botServo.write(posBM);
-  topServo.write(posTM);
-  delay(timer);
+  botServo.write(posX);
+  topServo.write(posY);
   }
 
-void botleftStop(int posBL, int timer){
+void botleftStop(int posX, int posY, int steps){
   Serial.print("(6)The position of Top is : ");
-  Serial.print(posBL);
+  Serial.print(posX);
   Serial.print("  Movement Function: ");
   Serial.println("Bottom Left Stop");
-  botServo.write(posBL);
-  delay(timer);
+  botServo.write(posX);
 }
