@@ -1,3 +1,5 @@
+// Code created by David Paez... March 13, 2019 
+
 #include <Wire.h>
 
 #define MOTOR_A 0
@@ -25,25 +27,28 @@ void driveArdumoto(byte motor, byte dir, byte spd)
     analogWrite(PWMB, spd);
   }  
 }
-void forwardDrive(){
-    driveArdumoto(MOTOR_A, FORWARD, 255); 
-    driveArdumoto(MOTOR_B, FORWARD, 255); 
-    Serial.println("Forward");
+void drive (byte dir){
+ switch(dir){
+    case 1:
+      driveArdumoto(MOTOR_A, FORWARD, 255); 
+      driveArdumoto(MOTOR_B, FORWARD, 255); 
+      Serial.println("Forward");
+      break;
+    case 2: 
+      driveArdumoto(MOTOR_A, REVERSE, 255); 
+      driveArdumoto(MOTOR_B, REVERSE, 255); 
+      Serial.println("Reverse");
+      break;
+    case 3:
+      driveArdumoto(MOTOR_A, FORWARD, 255); 
+      driveArdumoto(MOTOR_B, REVERSE, 255); 
+      Serial.println("Left");
+      break;
+    case 4:
+      driveArdumoto(MOTOR_A, REVERSE, 255); 
+      driveArdumoto(MOTOR_B, FORWARD, 255);
+      Serial.println("Right");
 }
-void reverseDrive(){
-    driveArdumoto(MOTOR_A, REVERSE, 255); 
-    driveArdumoto(MOTOR_B, REVERSE, 255); 
-    Serial.println("Reverse");
-}
-void leftDrive(){
-    driveArdumoto(MOTOR_A, FORWARD, 255); 
-    driveArdumoto(MOTOR_B, REVERSE, 255); 
-    Serial.println("Left");
-}
-void rightDrive(){
-    driveArdumoto(MOTOR_A, REVERSE, 255); 
-    driveArdumoto(MOTOR_B, FORWARD, 255); 
-    Serial.println("Right");
 }
 // stopArdumoto makes a motor stop
 void stopArdumoto(byte motor)
@@ -82,16 +87,16 @@ void loop() {
   Serial.println(caughtEvent);
   delay(1000);
   if(caughtEvent == 1){
-    forwardDrive();
+      drive(1);
   }
   else if(caughtEvent == 0){
-    reverseDrive();
+      drive(2);
   }
   else if(caughtEvent == 2){
-    rightDrive();
+      drive(3);
   }
   else if(caughtEvent == 3){
-    leftDrive();
+      drive(4);
   }
   else{
     Serial.println("Waiting for Response");
