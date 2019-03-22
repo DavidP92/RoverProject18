@@ -48,6 +48,11 @@ void drive (byte dir){
       driveArdumoto(MOTOR_A, REVERSE, 255); 
       driveArdumoto(MOTOR_B, FORWARD, 255);
       Serial.println("Right");
+      break;
+    case 5:
+       stopArdumoto(MOTOR_A);  // STOP motor A 
+       stopArdumoto(MOTOR_B);
+       break;
 }
 }
 // stopArdumoto makes a motor stop
@@ -97,6 +102,9 @@ void loop() {
   }
   else if(caughtEvent == 3){
       drive(4);
+  }
+  else if(caughtEvent == 5){
+      drive(5);
   }
   else{
     Serial.println("Waiting for Response");
