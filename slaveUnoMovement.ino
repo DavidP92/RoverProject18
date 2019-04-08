@@ -29,27 +29,27 @@ void driveArdumoto(byte motor, byte dir, byte spd)
 }
 void drive (byte dir){
  switch(dir){
-    case 1:
-      driveArdumoto(MOTOR_A, FORWARD, 255); 
-      driveArdumoto(MOTOR_B, FORWARD, 255); 
-      Serial.println("Forward");
-      break;
-    case 2: 
+    case 0:
       driveArdumoto(MOTOR_A, REVERSE, 255); 
       driveArdumoto(MOTOR_B, REVERSE, 255); 
       Serial.println("Reverse");
       break;
-    case 3:
+    case 1: 
+      driveArdumoto(MOTOR_A, FORWARD, 255); 
+      driveArdumoto(MOTOR_B, FORWARD, 255); 
+      Serial.println("Forward");
+      break;
+    case 2:
       driveArdumoto(MOTOR_A, FORWARD, 255); 
       driveArdumoto(MOTOR_B, REVERSE, 255); 
       Serial.println("Left");
       break;
-    case 4:
+    case 3:
       driveArdumoto(MOTOR_A, REVERSE, 255); 
       driveArdumoto(MOTOR_B, FORWARD, 255);
       Serial.println("Right");
       break;
-    case 5:
+    case 4:
        stopArdumoto(MOTOR_A);  // STOP motor A 
        stopArdumoto(MOTOR_B);
        break;
@@ -90,21 +90,20 @@ void setup() {
 
 void loop() {
   Serial.println(caughtEvent);
-  delay(1000);
-  if(caughtEvent == 1){
+  if(caughtEvent == 0){
+      drive(0);
+  }
+  else if(caughtEvent == 1){
       drive(1);
   }
-  else if(caughtEvent == 0){
+  else if(caughtEvent == 2){
       drive(2);
   }
-  else if(caughtEvent == 2){
+  else if(caughtEvent == 3){
       drive(3);
   }
-  else if(caughtEvent == 3){
+  else if(caughtEvent == 4){
       drive(4);
-  }
-  else if(caughtEvent == 5){
-      drive(5);
   }
   else{
     Serial.println("Waiting for Response");
