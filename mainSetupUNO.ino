@@ -22,6 +22,14 @@ unsigned long timer_2;  //Timer----> Motor Command
 uint8_t delay_1 = 100;
 uint8_t delay_2 = 3000;
 
+void laserRead(){
+  for (int j = 0; scan > j;j++){
+    Serial.print("Object Distance:    ");
+    Serial.println(Laser.distance());
+    xDistance = Laser.distance();
+    delay(24);
+  }
+}
 void sendCommand(byte dir) {
   Wire.beginTransmission(69);          // transmit to device #8               // sends five bytes
   Wire.write(dir);                     // sends one byte
@@ -36,54 +44,45 @@ void panMotion(byte dir){
       Serial.println("Forward Pan Motion");
       for (posPan = 0; posPan <= 160; posPan += 12) { 
         panServo.write(posPan);
-        Serial.println(posPan);   
-        laserRead();                     
+        Serial.println(posPan);                    
       }
   }
   else if ( dir ==1){
       Serial.println("Backward Pan Motion");
         for (posPan = 140; posPan >= 0; posPan -= 12) { 
         panServo.write(posPan);  
-        Serial.println(posPan);           
-        laserRead();                    
+        Serial.println(posPan);                          
       }
   }
     else if(dir==2){
-      posPan = 115;      panServo.write(posPan);
-      laserRead();
+      Serial.println("Sideways Pan");
+      posPan = 115;     
+      panServo.write(posPan);
     }
     
     else if(dir==3){
-      posPan = 0;
+      Serial.println("Straight @ Attention");
+      posPan = 10;
       panServo.write(posPan);
-      laserRead();
-      if(xDistance < 40){
-        sendCommand(4);
-        sendCommand(2);
-      }
-      else{
-        sendCommand(0);
-      }
     }
   }
 void tiltMotion(byte dir){
     if(dir == 0){
-      Serial.println("Forward Tilt Motion");
-      for (posTilt = 0; posTilt <= 25; posTilt += 5) { 
+        Serial.println("Midpoint Tilt Motion");
+        posTilt = 0;
         tiltServo.write(posTilt);
         Serial.println(posTilt); 
         laserRead();   
         delay(100);                  
       }
-    }
-    else if(dir == 1){
-      Serial.println("Backward Tilt Motion");
-      for (posTilt = 25; posTilt >= 0; posTilt -= 2) { 
+      else if(dir == 1){
+        Serial.println("Backward Tilt Motion");
+        posTilt = 8;
         tiltServo.write(posTilt);
         Serial.println(posTilt);            
         laserRead();
-        delay(100);                   
-      }
+        delay(200);                   
+      
     }
 }
 void readCompass(int item)
@@ -139,9 +138,11 @@ void readCompass(int item)
         Serial.println(value, 4);
         Serial.print(" Degrees F = ");
         Serial.println(myIMU.readTempF(), 4);
+        Serial.println();
       }
       break;
     case 4:
+      Serial.println("Heading of The Griffin: ");
       heading = atan2(myIMU.readMagY(), myIMU.readMagX());
       if (heading < 0)
         heading += 2 * PI;
@@ -153,14 +154,7 @@ void readCompass(int item)
       Serial.println(F("Failed to enter in a vaild option."));
   }
 }
-void laserRead(){
-  for (int j = 0; scan > j;j++){
-    Serial.print("Object Distance:    ");
-    Serial.println(Laser.distance());
-    xDistance = Laser.distance();
-    delay(24);
-  }
-}
+
 void setup(){
   Serial.begin(115200);
   panServo.attach(A0);
@@ -169,7 +163,7 @@ void setup(){
   Laser.configure(0);
   Serial.println("Laser Setup Completed");
   if (myIMU.begin(
-        MODE_I2C,
+        MODE_SPI,
         MAG_DO_40_Hz,
         MAG_FS_16_Ga,
         MAG_BDU_ENABLE,
@@ -192,22 +186,20 @@ void setup(){
 void loop() {
    int i = 0;
    start = millis();
-   panMotion(3);
+   panMotion(2);
    tiltMotion(0);
-   if(xDistance < 50){
-    sendCommand(4);
-    sendCommand(2);
-    i = i + 1;
-    if(xDistance < 40){
+   sendCommand(0);
+   if(xDistance <= 50){
+     sendCommand(4); 
+     panMotion(3);
+     delay(1000);
+     tiltMotion(1);
+     delay(1000);
+     if(xDistance < 80){
       sendCommand(3);
-      sendCommand(3);
-      i = i + 1;
-    }
-    else{
-      sendCommand(0);
-    }
-      if (xDistance < 40){
-        sendCommand(3); 
-        }
+     }
+     else{
+      sendCommand(2);
+     }
    }
 }
