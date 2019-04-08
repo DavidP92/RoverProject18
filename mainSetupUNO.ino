@@ -192,14 +192,15 @@ void loop() {
    if(xDistance <= 50){
      sendCommand(4); 
      panMotion(3);
-     delay(1000);
      tiltMotion(1);
      delay(1000);
      if(xDistance < 80){
       sendCommand(3);
+      delay(1000);
      }
      else{
       sendCommand(2);
+      delay(1000);
      }
    }
 }
